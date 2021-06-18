@@ -134,7 +134,7 @@ class ServiceNowAdapter extends EventEmitter {
       log.debug('ServiceNowAdapter is Healthy');
     }
 
-    return callback(result, error);
+    // return callback(result, error);
   });
 }
 
