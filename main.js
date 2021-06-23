@@ -93,11 +93,22 @@ class ServiceNowAdapter extends EventEmitter {
    * @param {ServiceNowAdapter~requestCallback} [callback] - The optional callback
    *   that handles the response.
    */
-  healthcheck(callback) {
-    // We will build this method in a later lab. For now, it will emulate
-    // a healthy integration by emmitting ONLINE.
-    this.emitOnline();
-  }
+    healthcheck(callback) {
+        this.getRecord((result, error) => {
+          if (error) {
+            
+            this.emitOffline();
+            log.error(error, `id:  ${this.id}`);
+
+          } else {
+
+            this.emitOnline();
+            log.debug('ServiceNowAdapter is Healthy');
+            }
+
+            return callback(result, error);
+        });
+    }
 
   /**
    * @memberof ServiceNowAdapter
@@ -146,12 +157,7 @@ class ServiceNowAdapter extends EventEmitter {
    *   handles the response.
    */
   getRecord(callback) {
-    /**
-     * Write the body for this function.
-     * The function is a wrapper for this.connector's get() method.
-     * Note how the object was instantiated in the constructor().
-     * get() takes a callback function.
-     */
+
      this.connector.get(callback);
   }
 
@@ -171,7 +177,7 @@ class ServiceNowAdapter extends EventEmitter {
      * Note how the object was instantiated in the constructor().
      * post() takes a callback function.
      */
-    this.connector.post(callback);
+     this.connector.post(callback);
   }
 }
 
