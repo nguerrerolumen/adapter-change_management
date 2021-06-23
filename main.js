@@ -106,7 +106,9 @@ class ServiceNowAdapter extends EventEmitter {
             log.debug('ServiceNowAdapter is Healthy');
             }
 
-            return callback(result, error);
+            if (callback) {
+                return callback(result, error);
+            }
         });
     }
 
@@ -158,7 +160,29 @@ class ServiceNowAdapter extends EventEmitter {
    */
   getRecord(callback) {
 
-     this.connector.get(callback);
+    this.connector.get((result, error) => {
+
+      var jsonResult = [];
+
+      if (result.body) {
+
+        JSON.parse(result.body).result.forEach(function(json) {
+            jsonResult.push({
+                change_ticket_number: json.number,
+                active: json.active,
+                priority: json.priority,
+                description: json.description,
+                work_start: json.work_start,
+                work_end: json.work_end,
+                change_ticket_key: json.sys_id
+            });
+        });
+
+        if (callback) {
+          return callback(jsonResult, error);
+        }
+      }
+    });
   }
 
   /**
@@ -171,13 +195,28 @@ class ServiceNowAdapter extends EventEmitter {
    *   handles the response.
    */
   postRecord(callback) {
-    /**
-     * Write the body for this function.
-     * The function is a wrapper for this.connector's post() method.
-     * Note how the object was instantiated in the constructor().
-     * post() takes a callback function.
-     */
-     this.connector.post(callback);
+
+     this.connector.post((result, error) => {
+
+      if (result.body) {
+
+        var json = JSON.parse(result.body).result;
+            
+        var jsonResult = {
+                change_ticket_number: json.number,
+                active: json.active,
+                priority: json.priority,
+                description: json.description,
+                work_start: json.work_start,
+                work_end: json.work_end,
+                change_ticket_key: json.sys_id
+        };
+
+        if (callback) {
+          return callback(jsonResult, error);
+        }
+      }
+    });
   }
 }
 
